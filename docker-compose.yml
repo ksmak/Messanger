@@ -1,0 +1,31 @@
+version: '3.4'
+
+volumes:
+  postgres_data:
+  
+services:
+  postgres_db:
+    container_name: postgres_db
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./Persistant/.env.dev.db
+    ports:
+      - 5432:5432
+
+  backend:
+    container_name: messanger_backend
+    build: 
+      context: ./Persistant
+      dockerfile: DockerFile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./Persistant/:/app/
+    ports:
+      - 8000:8000
+      - 5678:5678
+    env_file:
+      - ./Persistant/.env.dev
+    depends_on:
+      - postgres_db
